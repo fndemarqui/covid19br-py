@@ -4,14 +4,11 @@ from typing import Literal, Optional
 import urllib.error
 
 
-
-def download_covid19(level: Level = "brazil") -> pd.DataFrame:
+def download_covid19(
+    level: Literal["brazil", "regions", "states", "cities", "world"] = "brazil"
+) -> Optional[pd.DataFrame]:
     """
     Downloads COVID-19 data from a web repository.
-
-    This function downloads pandemic COVID-19 data at Brazil and World levels.
-    Brazilian data is available at national, region, state, and city levels,
-    whereas the world data is available at the country level.
 
     Parameters
     ----------
@@ -20,10 +17,10 @@ def download_covid19(level: Level = "brazil") -> pd.DataFrame:
 
     Returns
     -------
-    pandas.DataFrame
-        A DataFrame containing the downloaded data at the specified level.
-
-    Notes
+    pandas.DataFrame or None
+        A DataFrame containing the downloaded data, or None if download failed.
+    
+   Notes
     -----
     This function requires a Parquet reading engine like `pyarrow`.
     Install it with `pip install pyarrow`.
@@ -57,6 +54,8 @@ def download_covid19(level: Level = "brazil") -> pd.DataFrame:
     Examples
     --------
     >>> # Downloading Brazilian COVID-19 data:
+    >>> # from covid19br import
+    >>> # Downloading Brazilian COVID-19 data:
     >>> # brazil_df = download_covid19(level="brazil")
     >>> # regions_df = download_covid19(level="regions")
     >>> # states_df = download_covid19(level="states")
@@ -64,41 +63,31 @@ def download_covid19(level: Level = "brazil") -> pd.DataFrame:
 
     >>> # Downloading world COVID-19 data:
     >>> # world_df = download_covid19(level="world")
-    """
+    """    
 
-    # Construct the base URL for the data repository, pointing to Parquet files
-    BASE_URL = "https://github.com/dest-ufmg/covid19repo/blob/master/data/" 
-    
+    BASE_URL = "https://raw.githubusercontent.com/dest-ufmg/covid19repo/master/data/"
 
-    
-    # Normalize input and validate against the allowed choices
+    # Normalize input
     level = level.lower()
     valid_levels = ["brazil", "regions", "states", "cities", "world"]
     if level not in valid_levels:
-        raise ValueError(
-            f"Invalid level '{level}'. "
-            f"Must be one of {valid_levels}"
-        )
-        
+        raise ValueError(f"Invalid level '{level}'. Must be one of {valid_levels}")
+
     print("Downloading COVID-19 data... please, be patient!")
 
-    # Build the specific URL based on data_type and level
-    url = f"{BASE_URL}{level}.parquet?raw=true"
-    
+    url = f"{BASE_URL}{level}.parquet"
+
     try:
         data = pd.read_parquet(url)
-        # The source data uses different date formats, so we standardize them
-        # by converting to datetime objects, handling potential errors.
-        if 'date' in data.columns:
-            data['date'] = pd.to_datetime(data['date'], errors='coerce')
+        if "date" in data.columns:
+            data["date"] = pd.to_datetime(data["date"], errors="coerce")
         return data
     except ImportError:
-        print("Error: `pyarrow` is not installed. Please install it with `pip install pyarrow`.")
+        print("Error: `pyarrow` or `fastparquet` is not installed. Install with `pip install pyarrow`.")
         return None
-    except urllib.error.HTTPError:
-        print(f"Error: Could not find data file at the specified URL: {url}")
+    except (OSError, ValueError):
+        print(f"Error: Could not read data file at the specified URL: {url}")
         return None
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         return None
-

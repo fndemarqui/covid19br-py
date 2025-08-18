@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "covid19br"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="Fabio N. Demarqui", email="fndemarqui@est.ufmg.br" },
 ]
