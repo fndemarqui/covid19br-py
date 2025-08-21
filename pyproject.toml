@@ -29,3 +29,7 @@ dependencies = [
 Homepage = "https://github.com/fndemarqui/covid19br-py"
 Issues = "https://github.com/fndemarqui/covid19br-py/issues"
 
+[tool.pytest.ini_options]
+testpaths = [
+  "tests"
+]
