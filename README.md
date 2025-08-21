@@ -1,6 +1,10 @@
 # covid19br
 
 <!-- badges: start -->
+[![pypi](https://img.shields.io/pypi/v/covid19br.svg?style=flat-square)](https://pypi.python.org/pypi/covid19br)
+[![GH Actions](https://github.com/covid19br/covid19br/workflows/Python%20package/badge.svg)](https://github.com/covid19br/covid19br/actions?query=workflow%3A%22Python+package%22)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/covid19br?style=flat&label=pypi)
+
 
 
 <!-- badges: end -->
